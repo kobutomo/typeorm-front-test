@@ -1,24 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import axios from "axios"
 
 const App: React.FC = () => {
+  type User = {
+    id: number
+    login: string
+    password: string
+    delete: boolean
+  }
+  const initialState: User[] = []
+  const [state, setState] = useState(initialState)
+  const fetchUsers = async () => {
+    const users = await axios.get<User[]>("/api/read").catch(err => console.log(err))
+    if (users) {
+      setState(users.data)
+    }
+  }
+  const addUser = async () => {
+    await axios.get("/api/").catch(err => console.log(err))
+  }
+  const mapUsers = () => {
+      const userList = state.map(user => {
+        return (
+          <div>
+          {user.id}
+          <br />
+          {user.login}
+        </div>
+      )
+    })
+    return userList
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input type="text" />
+      <input type="password" name="" id="" />
+      <button onClick={_ => fetchUsers()}>ボタン</button>
+      <button onClick={_ => addUser()}>ボタン2</button>
+      {mapUsers()}
     </div>
   );
 }
