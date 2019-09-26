@@ -10,6 +10,13 @@ const App: React.FC = () => {
   }
   const initialState: User[] = []
   const [state, setState] = useState(initialState)
+
+  type LoginState = {
+    email: string,
+    password: string
+  }
+  const [loginState, setLoginState] = useState<LoginState>({ email: "", password: "" })
+
   const fetchUsers = async () => {
     const users = await axios.get<User[]>("/api/read").catch(err => console.log(err))
     if (users) {
@@ -17,12 +24,15 @@ const App: React.FC = () => {
     }
   }
   const addUser = async () => {
-    await axios.get("/api/").catch(err => console.log(err))
+    let params = new URLSearchParams()
+    params.append("email", loginState.email)
+    params.append("password", loginState.password)
+    await axios.post("/api/create/", params).then(res => { console.log(res) }).catch(err => console.log(err))
   }
   const mapUsers = () => {
-      const userList = state.map(user => {
-        return (
-          <div>
+    const userList = state.map(user => {
+      return (
+        <div>
           {user.id}
           <br />
           {user.login}
@@ -33,10 +43,18 @@ const App: React.FC = () => {
   }
   return (
     <div className="App">
-      <input type="text" />
-      <input type="password" name="" id="" />
-      <button onClick={_ => fetchUsers()}>ボタン</button>
-      <button onClick={_ => addUser()}>ボタン2</button>
+      <input type="text"
+        onChange={(e) => {
+          setLoginState({ ...loginState, email: e.target.value })
+        }}
+      />
+      <input type="password" name="" id=""
+        onChange={(e) => {
+          setLoginState({ ...loginState, password: e.target.value })
+        }}
+      />
+      <button onClick={_ => addUser()}>登録</button>
+      <button onClick={_ => fetchUsers()}>fetch</button>
       {mapUsers()}
     </div>
   );
